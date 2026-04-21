@@ -332,7 +332,7 @@ la capacitancia y frecuencia crece de forma exponencial.</p>
         # Estrellas
         for a in angulos_est:
             _, f_est = calcular_fisica(a)
-            ax.text(f_est, 0.75, "★", color='#ffd700', ha='center', fontsize=15)
+            ax.text(f_est+50, 0.75, "★", color='#ffd700', ha='center', fontsize=15)
 
         # Aguja
         f_vis = np.clip(f_khz, 450, 1700)
