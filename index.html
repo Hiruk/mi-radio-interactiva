@@ -325,29 +325,41 @@ interactiva o visualización dinámica</h1>
 <p>A continuación, se mostrará la simulación de un radio de la época, aquí el objeto interactivo será el circulo del slider, a medida que
 este se mueva tanto la frecuencia, como la capacitancia y el dial
 superior irán cambiando: </p>
-<div id="contenedor-radio" style="margin: 20px auto; width: 100%; border: 5px solid #3e2723; border-radius: 10px; padding: 15px; background: #2b1a12; text-align: center;">
+<div style="display:none;">
+    <audio id="track1" src="./recursos_radio/cancion1.wav" loop></audio>
+    <audio id="track2" src="./recursos_radio/cancion2.wav" loop></audio>
+    <audio id="track3" src="./recursos_radio/cancion3.wav" loop></audio>
+    <audio id="track4" src="./recursos_radio/cancion4.wav" loop></audio>
+    <audio id="track5" src="./recursos_radio/cancion5.wav" loop></audio>
+    <audio id="track6" src="./recursos_radio/cancion6.wav" loop></audio>
+    <audio id="track7" src="./recursos_radio/cancion7.wav" loop></audio>
+    <audio id="estatica" src="https://www.soundjay.com/communication/radio-static-01.mp3" loop></audio>
+</div>
+
+<div id="contenedor-radio" style="margin: 20px auto; width: 100%; border: 5px solid #3e2723; border-radius: 10px; padding: 15px; background: #2b1a12; text-align: center; color: #ffecb3;">
     
-    <link rel="stylesheet" href="https://pyscript.net/releases/2024.1.1/core.css" />
-    <script type="module" src="https://pyscript.net/releases/2024.1.1/core.js"></script>
+    <button id="btn-encender" onclick="iniciarRadio()" style="padding:15px 30px; background:#d32f2f; color:white; border:none; border-radius:5px; cursor:pointer; font-weight:bold; margin-bottom:10px;">
+        📻 CLIC PARA ENCENDER RADIO
+    </button>
 
     <div id="plot-area" style="width: 100%; min-height: 400px;"></div>
 
-    <div style="background: #3e2723; padding: 20px; border-radius: 8px; color: #ffecb3;">
-        <label for="slider-theta" style="font-family: serif; font-weight: bold;">
-            GIRAR PERILLA DEL CAPACITOR (θ): <span id="val-theta">0</span>°
+    <div style="background: #3e2723; padding: 20px; border-radius: 8px;">
+        <label style="font-family: serif; font-weight: bold;">
+            ÁNGULO DEL CAPACITOR (θ): <span id="val-theta">0</span>°
         </label><br>
-        <input type="range" id="slider-theta" min="0" max="179.9" step="0.1" value="0" 
-               style="width: 80%; margin: 15px 0; accent-color: #d32f2f;">
+        <input type="range" id="slider-theta" min="0" max="179.9" step="0.1" value="0" style="width: 80%; margin: 15px 0; accent-color: #d32f2f;">
         
-        <div id="info-tecnica" style="font-family: monospace; font-size: 1.1em; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 5px;">
+        <div id="info-tecnica" style="font-family: monospace; background: rgba(0,0,0,0.4); padding: 10px; border-radius: 5px;">
             C: -- pF | f: -- kHz
         </div>
-        <p style="font-size: 0.8em; color: #b8860b; margin-top: 10px;">
-        </p>
     </div>
 
+    <link rel="stylesheet" href="https://pyscript.net/releases/2024.1.1/core.css" />
+    <script type="module" src="https://pyscript.net/releases/2024.1.1/core.js"></script>
+
     <py-config>
-        packages = ["numpy", "matplotlib", "scipy"]
+        packages = ["numpy", "matplotlib"]
     </py-config>
 
     <script type="py">
@@ -356,67 +368,84 @@ superior irán cambiando: </p>
         from pyscript import display, window, document
         from pyodide.ffi import create_proxy
 
-        # --- Parámetros Físicos ---
-        N, R, d_orig, L = 10, 0.05, 0.002, 220e-6
+        # --- Física del Circuito ---
+        N, R, d, L = 10, 0.05, 0.002, 220e-6
         EPS_0, C_PAR = 8.854e-12, 4e-11
 
-        def calcular_física(theta_deg):
+        # Frecuencias objetivo para las 7 estaciones
+        angulos_est = [10, 65, 105, 135, 155, 170, 179]
+        
+        def calcular_fisica(theta_deg):
             theta_rad = np.radians(theta_deg)
             area = 0.5 * (R**2) * (np.pi - theta_rad)
-            C = (((2 * N - 1) * EPS_0 * area) / (d_orig / 2)) + C_PAR
+            C = (((2 * N - 1) * EPS_0 * area) / (d / 2)) + C_PAR
             f_khz = (1 / (2 * np.pi * np.sqrt(L * C))) / 1e3
             return C, f_khz
 
-        # --- Configuración del Gráfico Vintage ---
         fig, ax = plt.subplots(figsize=(10, 5))
         fig.patch.set_facecolor('#2b1a12')
-        
+
         def render_radio(theta_val):
             ax.clear()
-            C, f_khz = calcular_física(theta_val)
+            C, f_khz = calcular_fisica(theta_val)
             
-            # Fondo del dial
-            rect = plt.Rectangle((450, 0.3), 1300, 0.4, color='#fff9c4', ec='black', lw=2, alpha=0.9)
-            ax.add_patch(rect)
-            
-            # Marcas de frecuencia
+            # Dibujar Dial
+            ax.add_patch(plt.Rectangle((450, 0.3), 1300, 0.4, color='#fff9c4', ec='black', lw=2, alpha=0.9))
             for f in range(500, 1701, 200):
-                ax.text(f, 0.22, str(f), ha='center', color='white', fontweight='bold', fontsize=10)
+                ax.text(f, 0.22, str(f), ha='center', color='white', fontweight='bold')
             
-            # Dibujar estrellas en estaciones fijas (física)
-            angulos_est = [10, 65, 105, 135, 155, 170, 179]
+            # Marcas de Estaciones
             for a in angulos_est:
-                _, f_est = calcular_física(a)
-                ax.plot([f_est, f_est], [0.3, 0.4], color='#b8860b', lw=1.5)
-                ax.text(f_est, 0.75, "★", color='#b8860b', ha='center', fontsize=10)
+                _, f_est = calcular_fisica(a)
+                ax.text(f_est, 0.75, "★", color='#b8860b', ha='center')
 
-            # Aguja roja
+            # Aguja
             f_vis = np.clip(f_khz, 450, 1700)
-            ax.plot([f_vis, f_vis], [0.32, 0.68], color='#d32f2f', lw=4, solid_capstyle='round')
-
-            # Logotipo Radio-Campos
-            ax.text(1075, 0.88, "RADIO-CAMPOS", color='#d4af37', fontsize=28, 
-                    fontweight='black', fontstyle='italic', family='serif', ha='center')
+            ax.plot([f_vis, f_vis], [0.32, 0.68], color='#d32f2f', lw=4)
+            ax.text(1075, 0.88, "SONORA", color='#d4af37', fontsize=28, fontweight='black', fontstyle='italic', family='serif', ha='center')
             
-            ax.set_xlim(450, 1750)
-            ax.set_ylim(0, 1)
-            ax.axis('off')
-            
+            ax.set_xlim(450, 1750); ax.set_ylim(0, 1); ax.axis('off')
             document.getElementById("info-tecnica").innerHTML = f"C: {C*1e12:.1f} pF | f: {f_khz:.1f} kHz"
             display(fig, target="plot-area", append=False)
+            return f_khz
 
-        async def on_slider_change(event):
+        async def actualizar_radio(event):
             theta = float(event.target.value)
             document.getElementById("val-theta").innerHTML = f"{theta:.1f}"
-            render_radio(theta)
+            f_actual = render_radio(theta)
+            
+            # --- Gestión de Audio (Mezcla de Estaciones) ---
+            for i, a_inc in enumerate(angulos_est):
+                _, f_est = calcular_fisica(a_inc)
+                audio = document.getElementById(f"track{i+1}")
+                
+                # Cálculo de volumen (Gaussiano)
+                distancia = abs(f_actual - f_est)
+                vol = np.exp(-(distancia**2) / (2 * 25**2))
+                audio.volume = float(np.clip(vol, 0, 1))
+            
+            # Estática (inversa al volumen de las estaciones)
+            max_vol = max([document.getElementById(f"track{i+1}").volume for i in range(7)])
+            document.getElementById("estatica").volume = float(np.clip(0.15 * (1 - max_vol), 0, 0.2))
 
-        # Registro del evento
-        slider_proxy = create_proxy(on_slider_change)
+        slider_proxy = create_proxy(actualizar_radio)
         document.getElementById("slider-theta").addEventListener("input", slider_proxy)
-
-        # Render inicial
         render_radio(0)
     </script>
+</div>
+
+<script>
+    function iniciarRadio() {
+        // Desbloquea todos los audios por interacción del usuario
+        const tracks = ["track1", "track2", "track3", "track4", "track5", "track6", "track7", "estatica"];
+        tracks.forEach(id => {
+            let a = document.getElementById(id);
+            a.play();
+            a.volume = 0;
+        });
+        document.getElementById("btn-encender").style.display = "none";
+    }
+</script>
 </div>
 <h1 id="conclusiones">6. Conclusiones</h1>
 <p>A la hora de modificar la frecuencia en un radio antiguo, se
@@ -427,7 +456,7 @@ recibida.</p>
 pero a medida que la apertura es más prominente, la manera en que cambia
 la capacitancia y frecuencia crece de forma exponencial.</p>
 <div class="thebibliography">
-<p><span>00</span></p>
+<h1 id="conclusiones">Referencias</h1>
 <p>R. A. Serway y J. W. Jewett, Física para ciencias e ingeniería, vol.
 2, 7.ª ed. Ciudad de México, México: Cengage Learning, 2009.</p>
 <p>R. P. Deshpande, "How do tuning capacitors work?," Capacitor Connect,
