@@ -139,7 +139,7 @@
     table caption {
       margin-bottom: 0.75em;
     }
-    tbody {
+    t {
       margin-top: 0.5em;
       border-top: 1px solid #1a1a1a;
       border-bottom: 1px solid #1a1a1a;
@@ -183,6 +183,9 @@
   </style>
 </head>
 <body>
+  <button onclick="document.getElementById('track1').play(); alert('Intentando sonar...');">
+    PROBAR CANCIÓN 1 MANUALMENTE
+</button>
 <header id="title-block-header">
 <h1 class="title">Simulación Computacional de Problema con Capacitor de
 Aire Variable</h1>
@@ -326,7 +329,7 @@ interactiva o visualización dinámica</h1>
 este se mueva tanto la frecuencia, como la capacitancia y el dial
 superior irán cambiando: </p>
 <div style="display:none;">
-    <audio id="track1" src="./recursos_radio/cancion1.wav" loop></audio>
+    <audio id="track1" src="recursos_radio/cancion1.wav" loop></audio>
     <audio id="track2" src="./recursos_radio/cancion2.wav" loop></audio>
     <audio id="track3" src="./recursos_radio/cancion3.wav" loop></audio>
     <audio id="track4" src="./recursos_radio/cancion4.wav" loop></audio>
@@ -402,7 +405,7 @@ superior irán cambiando: </p>
             # Aguja
             f_vis = np.clip(f_khz, 450, 1700)
             ax.plot([f_vis, f_vis], [0.32, 0.68], color='#d32f2f', lw=4)
-            ax.text(1075, 0.88, "SONORA", color='#d4af37', fontsize=28, fontweight='black', fontstyle='italic', family='serif', ha='center')
+            ax.text(1075, 0.88, "RADIO-CAMPOS", color='#d4af37', fontsize=28, fontweight='black', fontstyle='italic', family='serif', ha='center')
             
             ax.set_xlim(450, 1750); ax.set_ylim(0, 1); ax.axis('off')
             document.getElementById("info-tecnica").innerHTML = f"C: {C*1e12:.1f} pF | f: {f_khz:.1f} kHz"
