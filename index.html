@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="author" content="Iván Darío Caro" />
+    <title>Simulación Computacional de Problema con Capacitor de Aire Variable</title>
+
+    <link rel="stylesheet" href="https://pyscript.net/releases/2024.1.1/core.css" />
+    <script type="module" src="https://pyscript.net/releases/2024.1.1/core.js"></script>
+
+    <style>
+        :root {
+            --madera: #3e2723;
+            --bronce: #b8860b;
+            --papel: #fdf5e6;
+            --texto-p: #1a1a1a;
+        }
+
+        /* Estética general - Escritorio de Ingeniero */
+        body {
+            background: #2b1a12;
+            background-image: url('https://www.transparenttextures.com/patterns/dark-wood.png');
+            font-family: 'Georgia', serif;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .main-container {
+            background-color: var(--papel);
+            max-width: 900px;
+            padding: 50px;
+            box-shadow: 0 10px 60px rgba(0,0,0,0.6);
+            border: 1px solid #d4c4a8;
+            color: var(--texto-p);
+            line-height: 1.6;
+        }
+
+        /* Banner superior informativo */
+        .alerta-github {
+            background: #fff3cd;
+            border: 1px solid #ffeeba;
+            padding: 20px;
+            text-align: center;
+            border-radius: 10px;
+            margin-bottom: 40px;
+        }
+
+        header { border-bottom: 3px solid var(--madera); margin-bottom: 40px; text-align: center; }
+        h1 { color: var(--madera); text-transform: uppercase; font-size: 2em; }
+        h2, .title-h1 { color: var(--madera); border-left: 5px solid var(--bronce); padding-left: 15px; margin-top: 40px; }
+
+        .abstract {
+            background: rgba(184, 134, 11, 0.05);
+            border: 1px solid var(--bronce);
+            padding: 20px;
+            margin: 20px 0;
+            font-style: italic;
+            font-size: 0.95em;
+        }
+
+        .abstract-title { font-weight: bold; text-align: center; display: block; margin-bottom: 10px; }
+
+        /* Imágenes */
+        figure { text-align: center; margin: 30px 0; }
+        img { max-width: 80%; border: 1px solid #ccc; padding: 5px; background: #fff; box-shadow: 3px 3px 10px rgba(0,0,0,0.1); }
+        figcaption { font-size: 0.9em; color: #555; margin-top: 10px; font-style: italic; }
+
+        /* Estética de la Radio Interactiva */
+        #contenedor-radio {
+            background: #121212 !important;
+            border: 12px solid var(--madera);
+            outline: 4px solid var(--bronce);
+            border-radius: 15px;
+            padding: 25px;
+            margin: 50px 0;
+            text-align: center;
+            box-shadow: inset 0 0 50px #000;
+        }
+
+        #plot-area { width: 100%; min-height: 400px; }
+
+        .radio-controls {
+            background: #1e1e1e;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #333;
+            margin-top: 10px;
+        }
+
+        #info-tecnica {
+            font-family: 'Courier New', monospace;
+            background: rgba(0,0,0,0.6);
+            color: #ffb300; /* Ámbar retro */
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 1.2em;
+            border: 1px solid #444;
+        }
+
+        input[type="range"] { width: 85%; margin: 15px 0; accent-color: #d32f2f; cursor: pointer; }
+
+        .thebibliography { margin-top: 50px; border-top: 2px solid #ddd; padding-top: 20px; font-size: 0.9em; }
+        
+        math { font-size: 1.1em; }
+    </style>
+</head>
+<body>
+
+<div class="main-container">
+    <div class="alerta-github">
+        <p><strong>Nota:</strong> Para una experiencia completa con audio y las imágenes, te recomiendo ver la versión alojada en línea:</p>
+        <a href="https://hiruk.github.io/mi-radio-interactiva/" style="background: #d32f2f; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">
+            🌐 ABRIR SIMULACIÓN EN GITHUB
+        </a>
+    </div>
+
+    <header id="title-block-header">
+        <h1 class="title">Simulación Computacional de Problema con Capacitor de Aire Variable</h1>
+        <p class="author"><strong>Iván Darío Caro</strong></p>
+        <div class="abstract">
+            <div class="abstract-title">Abstract</div>
+            <p>En este trabajo se buscará resolver un ejercicio sobre un capacitor de aire variable, para luego plantear un análisis funcional del mismo y realizar una simulación tomándolo como base, de esta forma podemos acercar más la manera en que relacionamos problemas con situaciones cotidianas o elementos comunes del hogar.</p>
+        </div>
+    </header>
+
+    <h2 id="enunciado-del-problema-asignado">1. Enunciado del problema asignado</h2>
+    <p>Un capacitor de aire variable utilizado en un circuito sintonizador de radio está hecho de 
+    <math display="inline"><mi>N</mi></math> placas semicirculares, cada una de radio 
+    <math display="inline"><mi>R</mi></math> y colocadas entre sí a una distancia 
+    <math display="inline"><mi>d</mi></math>, y conectadas eléctricamente. Como puede observar en las figuras 26.16 y P26.6, un segundo conjunto de placas idénticas, está intercalado con el primer conjunto. Cada placa en el segundo juego está a la mitad de las del primer conjunto. El segundo conjunto puede girar como una sola unidad. Determine la capacitancia como una función del ángulo de rotación 
+    <math display="inline"><mi>θ</mi></math>, en donde 
+    <math display="inline"><mi>θ</mi><mo>=</mo><mn>0</mn></math> corresponde a la posición de máxima capacitancia.[1]</p>
+
+    <figure>
+        <img src="Fig 26.16.png" alt="Figura 26.16">
+        <figcaption>Figura 1: Estructura del capacitor</figcaption>
+    </figure>
+
+    <figure>
+        <img src="Fig p26.6.png" alt="Figura P26.6">
+        <figcaption>Figura 2: Vista superior de rotación</figcaption>
+    </figure>
+
+    <h2 id="solución-matemática-completa">2. Solución matemática completa</h2>
+    <p>Para empezar, debemos tener presente a <math display="inline"><mi>θ</mi><mo>=</mo><mn>0</mn></math> que es la máxima capacitancia en nuestro circuito, y también el área del semicírculo que estará dada por la Eq.(1):</p>
+    <p style="text-align:center;"><math display="block"><mi>A</mi><mo>=</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mi>π</mi><msup><mi>r</mi><mn>2</mn></msup></math></p>
+
+    <p>Por lo tanto, a medida que aumenta <math display="inline"><mi>θ</mi></math>, irá disminuyendo el área efectiva del capacitor, de la siguiente manera Eq. 2:</p>
+    <p style="text-align:center;"><math display="block"><mi>A</mi><mo>=</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mo stretchy="false">(</mo><mi>π</mi><mo>−</mo><mi>θ</mi><mo stretchy="false">)</mo><msup><mi>r</mi><mn>2</mn></msup><mo>=</mo><mfrac><mrow><mo stretchy="false">(</mo><mi>π</mi><mo>−</mo><mi>θ</mi><mo stretchy="false">)</mo><msup><mi>r</mi><mn>2</mn></msup></mrow><mn>2</mn></mfrac></math></p>
+
+    <p>En esta disposición de placas paralelas, el número de campos eléctricos que se forman entre 2 placas, es 3, tal como se muestra en la imagen a continuación:</p>
+    <figure>
+        <img src="Placas paralelas.png" alt="Campos eléctricos">
+        <figcaption>Figura 3: Campos eléctricos entre placas paralelas</figcaption>
+    </figure>
+
+    <p>Si seguimos añadiendo placas, cada placa nueva formará otras dos regiones con capacitancia efectiva, por lo tanto, el número de regiones será <math display="inline"><mn>2</mn><mi>N</mi><mo>−</mo><mn>1</mn></math>, siendo <math display="inline"><mi>N</mi></math> el número de placas.</p>
+    <p>Dada la Ecuación (3) de la capacitancia de placas paralelas estándar:</p>
+    <p style="text-align:center;"><math display="block"><mi>C</mi><mo>=</mo><mfrac><mrow><msub><mi>ϵ</mi><mn>0</mn></msub><mi>A</mi></mrow><mi>d</mi></mfrac></math></p>
+
+    <p>Al estar intercaladas las placas superiores a medio camino entre la separación de las 2 placas inferiores, podemos inferir que la separación entre placas superior y placa inferior, será <math display="inline"><mfrac><mi>d</mi><mn>2</mn></mfrac></math>.</p>
+
+    <p>La capacitancia final estará dada por Eq. (5):</p>
+    <p style="text-align:center;"><math display="block"><mi>C</mi><mo>=</mo><mfrac><mrow><mo stretchy="false">(</mo><mn>2</mn><mi>N</mi><mo>−</mo><mn>1</mn><mo stretchy="false">)</mo><msub><mi>ϵ</mi><mn>0</mn></msub><mo stretchy="false">(</mo><mi>π</mi><mo>−</mo><mi>θ</mi><mo stretchy="false">)</mo><msup><mi>r</mi><mn>2</mn></msup></mrow><mi>d</mi></mfrac></math></p>
+
+    <h2 id="análisis-funcional-o-teórico">3. Análisis funcional o teórico</h2>
+    <p>Este dispositivo es un ejemplo clásico de cómo un cambio en la configuración mecánica se traduce directamente en un cambio en una propiedad eléctrica. Al girar la perilla estamos modificando la frecuencia de sintonía.</p>
+    <figure>
+        <img src="Radio.png" alt="Dial Radio">
+        <figcaption>Figura 4: Dial para sintonizar frecuencias en un radio antiguo</figcaption>
+    </figure>
+
+    <h2 id="simulación-interactiva">5. Simulación interactiva</h2>
+    <p>A continuación, se muestra la simulación sobre cómo afecta el movimiento de un dial en la frecuencia de una radio:</p>
+
+    <div id="contenedor-radio">
+        <button id="btn-encender" onclick="iniciarRadio()" style="padding:15px 30px; background:#d32f2f; color:white; border:none; border-radius:5px; cursor:pointer; font-weight:bold; margin-bottom:15px; font-family:serif;">
+            📻 CLIC PARA ENCENDER RADIO
+        </button>
+
+        <div id="plot-area"></div>
+
+        <div class="radio-controls">
+            <label style="color: #ffecb3; font-weight: bold; font-family: serif;">
+                ÁNGULO DEL CAPACITOR (θ): <span id="val-theta" style="color:white; font-size:1.2em;">0</span>°
+            </label><br>
+            <input type="range" id="slider-theta" min="0" max="179.9" step="0.1" value="0">
+            
+            <div id="info-tecnica">
+                C: -- pF | f: -- kHz
+            </div>
+        </div>
+    </div>
+
+    <h2 id="conclusiones">6. Conclusiones</h2>
+    <p>A la hora de modificar la frecuencia en un radio antiguo, se aprovechó la particularidad de cómo disminuía la capacitancia para modificar la frecuencia recibida. Es posible ver cómo un pequeño cambio en el ángulo no hace mucho, pero a medida que la apertura es más prominente, el cambio crece de forma exponencial.</p>
+
+    <div class="thebibliography">
+        <h3>Bibliografía</h3>
+        <p>[1] R. A. Serway y J. W. Jewett, Física para ciencias e ingeniería, vol. 2, 7.ª ed. 2009.</p>
+        <p>[2] R. P. Deshpande, "How do tuning capacitors work?," Capacitor Connect, 2024.</p>
+        <p>[3] Google Gemini, "Depuración y optimización de algoritmo en [Python]," v. 1.5 Flash, 2026.</p>
+    </div>
+</div>
+
+<div style="display:none;">
+    <audio id="track1" src="recursos_radio/cancion1.mp3" loop></audio>
+    <audio id="track2" src="recursos_radio/cancion2.mp3" loop></audio>
+    <audio id="track3" src="recursos_radio/cancion3.mp3" loop></audio>
+    <audio id="track4" src="recursos_radio/cancion4.mp3" loop></audio>
+    <audio id="track5" src="recursos_radio/cancion5.mp3" loop></audio>
+    <audio id="track6" src="recursos_radio/cancion6.mp3" loop></audio>
+    <audio id="track7" src="recursos_radio/cancion7.mp3" loop></audio>
+    <audio id="estatica" src="https://www.soundjay.com/communication/radio-static-01.mp3" loop></audio>
+</div>
+
+<py-config>
+    packages = ["numpy", "matplotlib"]
+</py-config>
+
+<script type="py">
+    import numpy as np
+    import matplotlib.pyplot as plt
+    from pyscript import display, document
+    from pyodide.ffi import create_proxy
+
+    N, R, d, L = 10, 0.05, 0.002, 220e-6
+    EPS_0, C_PAR = 8.854e-12, 4e-11
+    angulos_est = [10, 65, 105, 135, 155, 170, 179]
+    
+    fig, ax = plt.subplots(figsize=(10, 5))
+    fig.patch.set_facecolor('#121212')
+
+    def calcular_fisica(theta_deg):
+        theta_rad = np.radians(theta_deg)
+        area = 0.5 * (R**2) * (np.pi - theta_rad)
+        C = (((2 * N - 1) * EPS_0 * area) / (d / 2)) + C_PAR
+        f_khz = (1 / (2 * np.pi * np.sqrt(L * C))) / 1e3
+        return C, f_khz
+
+    def render_radio(theta_val):
+        ax.clear()
+        ax.set_facecolor('#000')
+        C, f_khz = calcular_fisica(theta_val)
+        
+        # Fondo Dial
+        ax.add_patch(plt.Rectangle((450, 0.3), 1300, 0.4, color='#222', ec='#b8860b', lw=2))
+        
+        # Textos Ámbar
+        for f in range(500, 1701, 200):
+            ax.text(f, 0.22, str(f), ha='center', color='#ffb300', fontweight='bold', fontsize=10)
+        
+        # Estrellas
+        for a in angulos_est:
+            _, f_est = calcular_fisica(a)
+            ax.text(f_est, 0.75, "★", color='#ffd700', ha='center', fontsize=15)
+
+        # Aguja
+        f_vis = np.clip(f_khz, 450, 1700)
+        ax.plot([f_vis, f_vis], [0.32, 0.68], color='#d32f2f', lw=4, zorder=10)
+        ax.text(1075, 0.88, "RADIO-CAMPOS VINTAGE", color='#d4af37', fontsize=22, fontweight='black', family='serif', ha='center')
+        
+        ax.set_xlim(450, 1750); ax.set_ylim(0, 1); ax.axis('off')
+        document.getElementById("info-tecnica").innerHTML = f"C: {C*1e12:.1f} pF | f: {f_khz:.1f} kHz"
+        display(fig, target="plot-area", append=False)
+        return f_khz
+
+    async def actualizar_radio(event):
+        theta = float(event.target.value)
+        document.getElementById("val-theta").innerHTML = f"{theta:.1f}"
+        f_actual = render_radio(theta)
+        
+        vols = []
+        for i in range(7):
+            _, f_est = calcular_fisica(angulos_est[i])
+            audio_elem = document.getElementById(f"track{i+1}")
+            vol = np.exp(-(abs(f_actual - f_est)**2) / (2 * 25**2))
+            nv = float(np.clip(vol, 0, 1))
+            if audio_elem: audio_elem.volume = nv
+            vols.append(nv)
+        
+        est = document.getElementById("estatica")
+        if est: est.volume = float(np.clip(0.15 * (1 - max(vols)), 0, 0.15))
+
+    proxy = create_proxy(actualizar_radio)
+    document.getElementById("slider-theta").addEventListener("input", proxy)
+    render_radio(0)
+</script>
+
+<script>
+    function iniciarRadio() {
+        const tracks = ["track1", "track2", "track3", "track4", "track5", "track6", "track7", "estatica"];
+        tracks.forEach(id => {
+            let a = document.getElementById(id);
+            if (a) {
+                a.play();
+                a.volume = 0;
+            }
+        });
+        document.getElementById("btn-encender").style.display = "none";
+    }
+</script>
+</body>
+</html>
