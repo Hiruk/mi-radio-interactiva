@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+  <meta charset="utf-8" />
+
+  <meta name="generator" content="pandoc" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+
+  <meta name="author" content="Iván Darío Caro" />
+
+  <title>Simulación Computacional de Problema con Capacitor de Aire Variable</title>
+
+  <style>
+
+    /* Default styles provided by pandoc.
+
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+
+    */
+
+    html {
+
+      color: #1a1a1a;
+
+      background-color: #fdfdfd;
+
+    }
+
+    body {
+
+      margin: 0 auto;
+
+      max-width: 36em;
+
+      padding-left: 50px;
+
+      padding-right: 50px;
+
+      padding-top: 50px;
+
+      padding-bottom: 50px;
+
+      hyphens: auto;
+
+      overflow-wrap: break-word;
+
+      text-rendering: optimizeLegibility;
+
+      font-kerning: normal;
+
+    }
+
+    @media (max-width: 600px) {
+
+      body {
+
+        font-size: 0.9em;
+
+        padding: 12px;
+
+      }
+
+      h1 {
+
+        font-size: 1.8em;
+
+      }
+
+    }
+
+    @media print {
+
+      html {
+
+        background-color: white;
+
+      }
+
+      body {
+
+        background-color: transparent;
+
+        color: black;
+
+        font-size: 12pt;
+
+      }
+
+      p, h2, h3 {
+
+        orphans: 3;
+
+        widows: 3;
+
+      }
+
+      h2, h3, h4 {
+
+        page-break-after: avoid;
+
+      }
+
+    }
+
+    p {
+
+      margin: 1em 0;
+
+    }
+
+    a {
+
+      color: #1a1a1a;
+
+    }
+
+    a:visited {
+
+      color: #1a1a1a;
+
+    }
+
+    img {
+
+      max-width: 100%;
+
+    }
+
+    svg {
+
+      height: auto;
+
+      max-width: 100%;
+
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+
+      margin-top: 1.4em;
+
+    }
+
+    h5, h6 {
+
+      font-size: 1em;
+
+      font-style: italic;
+
+    }
+
+    h6 {
+
+      font-weight: normal;
+
+    }
+
+    ol, ul {
+
+      padding-left: 1.7em;
+
+      margin-top: 1em;
+
+    }
+
+    li > ol, li > ul {
+
+      margin-top: 0;
+
+    }
+
+    blockquote {
+
+      margin: 1em 0 1em 1.7em;
+
+      padding-left: 1em;
+
+      border-left: 2px solid #e6e6e6;
+
+      color: #606060;
+
+    }
+
+    div.abstract {
+
+      margin: 2em 2em 2em 2em;
+
+      text-align: left;
+
+      font-size: 85%;
+
+    }
+
+    div.abstract-title {
+
+      font-weight: bold;
+
+      text-align: center;
+
+      padding: 0;
+
+      margin-bottom: 0.5em;
+
+    }
+
+    code {
+
+      white-space: pre-wrap;
+
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+
+      font-size: 85%;
+
+      margin: 0;
+
+      hyphens: manual;
+
+    }
+
+    pre {
+
+      margin: 1em 0;
+
+      overflow: auto;
+
+    }
+
+    pre code {
+
+      padding: 0;
+
+      overflow: visible;
+
+      overflow-wrap: normal;
+
+    }
+
+    .sourceCode {
+
+     background-color: transparent;
+
+     overflow: visible;
+
+    }
+
+    hr {
+
+      border: none;
+
+      border-top: 1px solid #1a1a1a;
+
+      height: 1px;
+
+      margin: 1em 0;
+
+    }
+
+    table {
+
+      margin: 1em 0;
+
+      border-collapse: collapse;
+
+      width: 100%;
+
+      overflow-x: auto;
+
+      display: block;
+
+      font-variant-numeric: lining-nums tabular-nums;
+
+    }
+
+    table caption {
+
+      margin-bottom: 0.75em;
+
+    }
+
+    tbody {
+
+      margin-top: 0.5em;
+
+      border-top: 1px solid #1a1a1a;
+
+      border-bottom: 1px solid #1a1a1a;
+
+    }
+
+    th {
+
+      border-top: 1px solid #1a1a1a;
+
+      padding: 0.25em 0.5em 0.25em 0.5em;
+
+    }
+
+    td {
+
+      padding: 0.125em 0.5em 0.25em 0.5em;
+
+    }
+
+    header {
+
+      margin-bottom: 4em;
+
+      text-align: center;
+
+    }
+
+    #TOC li {
+
+      list-style: none;
+
+    }
+
+    #TOC ul {
+
+      padding-left: 1.3em;
+
+    }
+
+    #TOC > ul {
+
+      padding-left: 0;
+
+    }
+
+    #TOC a:not(:hover) {
+
+      text-decoration: none;
+
+    }
+
+    span.smallcaps{font-variant: small-caps;}
+
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+
+    div.column{flex: auto; overflow-x: auto;}
+
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+
+    /* The extra [class] is a hack that increases specificity enough to
+
+       override a similar rule in reveal.js */
+
+    ul.task-list[class]{list-style: none;}
+
+    ul.task-list li input[type="checkbox"] {
+
+      font-size: inherit;
+
+      width: 0.8em;
+
+      margin: 0 0.8em 0.2em -1.6em;
+
+      vertical-align: middle;
+
+    }
+
+  </style>
+
+</head>
+
+<body>
+
+<header id="title-block-header">
+
+<h1 class="title">Simulación Computacional de Problema con Capacitor de
+
+Aire Variable</h1>
+
+<p class="author">Iván Darío Caro</p>
+
+<div class="abstract">
+
+<div class="abstract-title">Abstract</div>
+
+<p>En este trabajo se buscará resolver un ejercicio sobre un capacitor
+
+de aire variable, para luego plantear un análisis funcional del mismo y
+
+realizar una simulación tomaándolo como base, de esta forma podemos
+
+acercar más la manera en que relacionamos problemas con situaciones
+
+cotidianas o elementos comunes del hogar</p>
+
+</div>
+
+</header>
+
+<h1 id="enunciado-del-problema-asignado">1. Enunciado del problema
+
+asignado</h1>
+
+<p>Un capacitor de aire variable utilizado en un circuito sintonizador
+
+de radio está hecho de
+
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>N</mi><annotation encoding="application/x-tex">N</annotation></semantics></math>
+
+placas semicirculares, cada una de radio
+
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>R</mi><annotation encoding="application/x-tex">R</annotation></semantics></math>
+
+y colocadas entre sí a una distancia
+
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>d</mi><annotation encoding="application/x-tex">d</annotation></semantics></math>,
+
+y conectadas eléctricamente. Como puede observar en las figuras
+
+26.16(Figure 1) y P26.6(Figure 2), un segundo conjunto de placas
+
+idénticas, está intercalado con el primer conjunto. Cada placa en el
+
+segundo juego está a la mitad de las del primer conjunto. El segundo
+
+conjunto puede girar como una sola unidad. Determine la capacitancia
+
+como una función del ángulo de rotación
+
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>θ</mi><annotation encoding="application/x-tex">\theta</annotation></semantics></math>,
+
+en donde
+
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>θ</mi><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">\theta =0</annotation></semantics></math>
+
+corresponde a la posición de máxima capacitancia.[1]</p>
+
+<figure id="fig:placeholder">
+
+<img src="Fig 26.16.png" style="width:70.0%" />
+
+<figcaption aria-hidden="true"></figcaption>
+
+</figure>
+
+<figure id="fig:placeholder">
+
+<img src="Fig p26.6.png" style="width:70.0%" />
+
+<figcaption aria-hidden="true"></figcaption>
+
+</figure>
+
+<h1 id="solución-matemática-completa">2. Solución matemática
+
+completa</h1>
+
+<p>Para empezar, debemos tener presente a
+
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>θ</mi><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">\theta=0</annotation></semantics></math>
+
+que es la máxima capacitancia en nuestro circuito, y también el área del
+
+semicírculo que estará dada por la Eq.(1):</p>
+
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mo>=</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mi>π</mi><msup><mi>r</mi><mn>2</mn></msup></mrow><annotation encoding="application/x-tex">\begin{equation}
+
+A=\frac{1}{2}\pi r^2
+
+\end{equation}</annotation></semantics></math></p>
+
+<p>Por lo tanto, a medida que aumenta
+
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>θ</mi><annotation encoding="application/x-tex">\theta</annotation></semantics></math>,
+
+irá disminuyendo el área efectiva del capacitor, de la siguiente manera
+
+Eq. 2:</p>
+
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mo>=</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mo stretchy="false" form="prefix">(</mo><mi>π</mi><mo>−</mo><mi>θ</mi><mo stretchy="false" form="postfix">)</mo><msup><mi>r</mi><mn>2</mn></msup><mo>=</mo><mfrac><mrow><mo stretchy="false" form="prefix">(</mo><mi>π</mi><mo>−</mo><mi>θ</mi><mo stretchy="false" form="postfix">)</mo><msup><mi>r</mi><mn>2</mn></msup></mrow><mn>2</mn></mfrac></mrow><annotation encoding="application/x-tex">\begin{equation}
+
+A=\frac{1}{2}(\pi-\theta )r^2 = \frac{(\pi-\theta )r^2 }{2}
+
+\end{equation}</annotation></semantics></math></p>
+
+<p>En esta disposición de placas paralelas, el número de campos
+
+eléctricos que se forman entre 2 placas, es 3, tal como se muestra en la
+
+imagen (Figure 3) a continuación:</p>
+
+<figure id="fig:placeholder">
+
+<img src="Placas paralelas.png" style="width:70.0%" />
+
+<figcaption>Campos eléctricos entre placas paralelas</figcaption>
+
+</figure>
+
+<p>Si seguimos añadiendo placas, cada placa nueva formará otras dos
+
+regiones con capacitancia efectiva, por lo tanto, el número de regiones
+
+será
+
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>2</mn><mi>N</mi><mo>−</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">2N-1</annotation></semantics></math>,
+
+siendo
+
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>N</mi><annotation encoding="application/x-tex">N</annotation></semantics></math>
+
+el número de placas.</p>
+
+<p>Dada la Ecuación (3) de la capacitancia de placas paralelas
+
+estándar:</p>
+
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>C</mi><mo>=</mo><mfrac><mrow><msub><mi>ϵ</mi><mn>0</mn></msub><mi>A</mi></mrow><mi>d</mi></mfrac></mrow><annotation encoding="application/x-tex">\begin{equation}
+
+C=\frac{\epsilon_0A}{d}
+
+\end{equation}</annotation></semantics></math></p>
+
+<p>Al estar intercaladas las placas superiores a medio camino entre la
+
+separación de las
+
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>2</mn><annotation encoding="application/x-tex">2</annotation></semantics></math>
+
+placas inferiores, podemos inferir que la separación entre placas
+
+superior y placa inferior, será
+
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mfrac><mi>d</mi><mn>2</mn></mfrac><annotation encoding="application/x-tex">\frac{d}{2}</annotation></semantics></math>,
+
+como se ve en la imagen (Figure 3) agregada anteriormente.</p>
+
+<p>La capacitancia para el capacitor de
+
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>N</mi><annotation encoding="application/x-tex">N</annotation></semantics></math>
+
+placas, que puede rotar en un ángulo
+
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>θ</mi><annotation encoding="application/x-tex">\theta</annotation></semantics></math>,
+
+en dónde
+
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>θ</mi><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">\theta=0</annotation></semantics></math>
+
+es la capacitancia máxima, estará dada por Eq. (4) Eq. (5):</p>
+
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>C</mi><mo>=</mo><mo stretchy="false" form="prefix">(</mo><mn>2</mn><mi>N</mi><mo>−</mo><mn>1</mn><mo stretchy="false" form="postfix">)</mo><mfrac><mrow><msub><mi>ϵ</mi><mn>0</mn></msub><mfrac><mrow><mo stretchy="false" form="prefix">(</mo><mi>π</mi><mo>−</mo><mi>θ</mi><mo stretchy="false" form="postfix">)</mo><msup><mi>r</mi><mn>2</mn></msup></mrow><mn>2</mn></mfrac></mrow><mfrac><mi>d</mi><mn>2</mn></mfrac></mfrac></mrow><annotation encoding="application/x-tex">\begin{equation}
+
+C=(2N-1)\frac{\epsilon_0\frac{(\pi-\theta )r^2}{2}}{\frac{d}{2}}
+
+\end{equation}</annotation></semantics></math>
+
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>C</mi><mo>=</mo><mfrac><mrow><mo stretchy="false" form="prefix">(</mo><mn>2</mn><mi>N</mi><mo>−</mo><mn>1</mn><mo stretchy="false" form="postfix">)</mo><msub><mi>ϵ</mi><mn>0</mn></msub><mo stretchy="false" form="prefix">(</mo><mi>π</mi><mo>−</mo><mi>θ</mi><mo stretchy="false" form="postfix">)</mo><msup><mi>r</mi><mn>2</mn></msup></mrow><mi>d</mi></mfrac></mrow><annotation encoding="application/x-tex">\begin{equation}
+
+C=\frac{(2N-1)\epsilon_0(\pi-\theta )r^2}{d}
+
+\end{equation}</annotation></semantics></math></p>
+
+<h1 id="análisis-funcional-o-teórico">3. Análisis funcional o
+
+teórico</h1>
+
+<p>Este dispositivo es un ejemplo clásico de cómo un cambio en la
+
+configuración mecánica se traduce directamente en un cambio en una
+
+propiedad eléctrica.</p>
+
+<p>En un radio, este capacitor suele estar en paralelo con una bobina
+
+(inductor
+
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>L</mi><annotation encoding="application/x-tex">L</annotation></semantics></math>)
+
+para formar un circuito resonante. La frecuencia de resonancia
+
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>f</mi><annotation encoding="application/x-tex">f</annotation></semantics></math>
+
+es Eq. (6):</p>
+
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>f</mi><mo>=</mo><mfrac><mn>1</mn><msqrt><mrow><mi>L</mi><mi>C</mi></mrow></msqrt></mfrac></mrow><annotation encoding="application/x-tex">\begin{equation}
+
+f=\frac{1}{\sqrt{LC}}
+
+\end{equation}</annotation></semantics></math></p>
+
+<p>Como la capacitancia C es proporcional a
+
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>π</mi><mo>−</mo><mi>θ</mi></mrow><annotation encoding="application/x-tex">\pi- \theta</annotation></semantics></math>),
+
+al girar la perilla estamos modificando la frecuencia de sintonía, pero
+
+de una forma no lineal respecto al ángulo, esto puede explicar el porqué
+
+de que las radios más antiguas, las estaciones de alta frecuencia
+
+estaban más “juntas”, que las de baja frecuencia cuando se ve el dial
+
+del radio, como se puede ver en la siguiente imagen (Figure 4)[2]:</p>
+
+<figure id="fig:placeholder">
+
+<img src="Radio.png" style="width:100.0%" />
+
+<figcaption>Dial para sintonizar frecuencias en un radio</figcaption>
+
+</figure>
+
+<h1 id="planteamiento-de-la-simulación">4. Planteamiento de la
+
+simulación</h1>
+
+<p>Dado lo anterior, para la simulación, la idea es replicar el fenómeno
+
+visto a través de la formula de la frecuencia, al momento de ir
+
+aumentando el ángulo de separación entre la parte superior e inferior,
+
+debería verse como al principio la capacitancia no se reduce tanto y por
+
+lo mismo la frecuencia se mueve muy lentamente; luego al momento de ir
+
+aumentando el ángulo de separación se verá como cada vez se acelera más
+
+el movimiento en un dial de frecuencias [3].</p>
+
+<p>Para ello haremos uso de Python y de la Ecuación 5, los valores a
+
+reemplazar serán
+
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi><mo>=</mo><mn>10</mn></mrow><annotation encoding="application/x-tex">N=10</annotation></semantics></math>,
+
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>R</mi><mo>=</mo><mn>0.05</mn><mi>m</mi></mrow><annotation encoding="application/x-tex">R=0.05 m</annotation></semantics></math>,
+
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>d</mi><mo>=</mo><mn>0.002</mn><mi>m</mi></mrow><annotation encoding="application/x-tex">d=0.002 m</annotation></semantics></math>,
+
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>L</mi><mo>=</mo><mn>200</mn><mo>×</mo><msup><mn>10</mn><mrow><mi>−</mi><mn>6</mn></mrow></msup><mi>H</mi></mrow><annotation encoding="application/x-tex">L=200\times10^{-6}H</annotation></semantics></math>
+
+y
+
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>ϵ</mi><mn>0</mn></msub><mo>=</mo><mn>8.854</mn><mo>×</mo><msup><mn>10</mn><mrow><mi>−</mi><mn>12</mn></mrow></msup><mi>F</mi><mi>/</mi><mi>m</mi></mrow><annotation encoding="application/x-tex">\epsilon_0=8.854\times10^{-12} F/m</annotation></semantics></math>.</p>
+
+<h1 id="simulación-interactiva-o-visualización-dinámica">5. Simulación
+
+interactiva o visualización dinámica</h1>
+
+<p>A continuación, se mostrará una simulación sobre el como afecta el movimiento de un dial en la frecuencia de una radio, aquí el objeto interactivo será el circulo del slider, a medida que este se mueva tanto la frecuencia, como la capacitancia y el dial superior irán cambiando:
+</p>
+
+<div style="display:none;">
+    <audio id="track1" src="recursos_radio/cancion1.mp3" loop preload="auto"></audio>
+    <audio id="track2" src="recursos_radio/cancion2.mp3" loop preload="auto"></audio>
+    <audio id="track3" src="recursos_radio/cancion3.mp3" loop preload="auto"></audio>
+    <audio id="track4" src="recursos_radio/cancion4.mp3" loop preload="auto"></audio>
+    <audio id="track5" src="recursos_radio/cancion5.mp3" loop preload="auto"></audio>
+    <audio id="track6" src="recursos_radio/cancion6.mp3" loop preload="auto"></audio>
+    <audio id="track7" src="recursos_radio/cancion7.mp3" loop preload="auto"></audio>
+    <audio id="estatica" src="https://www.soundjay.com/communication/radio-static-01.mp3" loop></audio>
+</div>
+<div id="contenedor-radio" style="margin: 20px auto; width: 100%; border: 5px solid #3e2723; border-radius: 10px; padding: 15px; background: #2b1a12; text-align: center; color: #ffecb3;">
+    
+    <button id="btn-encender" onclick="iniciarRadio()" style="padding:15px 30px; background:#d32f2f; color:white; border:none; border-radius:5px; cursor:pointer; font-weight:bold; margin-bottom:10px;">
+        📻 CLIC PARA ENCENDER RADIO
+    </button>
+
+    <div id="plot-area" style="width: 100%; min-height: 400px;"></div>
+
+    <div style="background: #3e2723; padding: 20px; border-radius: 8px;">
+        <label style="font-family: serif; font-weight: bold;">
+            ÁNGULO DEL CAPACITOR (θ): <span id="val-theta">0</span>°
+        </label><br>
+        <input type="range" id="slider-theta" min="0" max="179.9" step="0.1" value="0" style="width: 80%; margin: 15px 0; accent-color: #d32f2f;">
+        
+        <div id="info-tecnica" style="font-family: monospace; background: rgba(0,0,0,0.4); padding: 10px; border-radius: 5px;">
+            C: -- pF | f: -- kHz
+        </div>
+    </div>
+
+    <link rel="stylesheet" href="https://pyscript.net/releases/2024.1.1/core.css" />
+    <script type="module" src="https://pyscript.net/releases/2024.1.1/core.js"></script>
+
+    <py-config>
+        packages = ["numpy", "matplotlib"]
+    </py-config>
+
+    <script type="py">
+        import numpy as np
+        import matplotlib.pyplot as plt
+        from pyscript import display, window, document
+        from pyodide.ffi import create_proxy
+
+        # --- Física del Circuito ---
+        N, R, d, L = 10, 0.05, 0.002, 220e-6
+        EPS_0, C_PAR = 8.854e-12, 4e-11
+
+        # Frecuencias objetivo para las 7 estaciones
+        angulos_est = [10, 65, 105, 135, 155, 170, 179]
+        
+        def calcular_fisica(theta_deg):
+            theta_rad = np.radians(theta_deg)
+            area = 0.5 * (R**2) * (np.pi - theta_rad)
+            C = (((2 * N - 1) * EPS_0 * area) / (d / 2)) + C_PAR
+            f_khz = (1 / (2 * np.pi * np.sqrt(L * C))) / 1e3
+            return C, f_khz
+
+        fig, ax = plt.subplots(figsize=(10, 5))
+        fig.patch.set_facecolor('#2b1a12')
+
+        def render_radio(theta_val):
+            ax.clear()
+            C, f_khz = calcular_fisica(theta_val)
+            
+            # Dibujar Dial
+            ax.add_patch(plt.Rectangle((450, 0.3), 1300, 0.4, color='#fff9c4', ec='black', lw=2, alpha=0.9))
+            for f in range(500, 1701, 200):
+                ax.text(f, 0.22, str(f), ha='center', color='white', fontweight='bold')
+            
+            # Marcas de Estaciones
+            for a in angulos_est:
+                _, f_est = calcular_fisica(a)
+                ax.text(f_est, 0.75, "★", color='#b8860b', ha='center')
+
+            # Aguja
+            f_vis = np.clip(f_khz, 450, 1700)
+            ax.plot([f_vis, f_vis], [0.32, 0.68], color='#d32f2f', lw=4)
+            ax.text(1075, 0.88, "RADIO-CAMPOS", color='#d4af37', fontsize=28, fontweight='black', fontstyle='italic', family='serif', ha='center')
+            
+            ax.set_xlim(450, 1750); ax.set_ylim(0, 1); ax.axis('off')
+            document.getElementById("info-tecnica").innerHTML = f"C: {C*1e12:.1f} pF | f: {f_khz:.1f} kHz"
+            display(fig, target="plot-area", append=False)
+            return f_khz
+async def actualizar_radio(event):
+            # 1. Actualizamos el texto del ángulo en el HTML
+            theta = float(event.target.value)
+            document.getElementById("val-theta").innerHTML = f"{theta:.1f}"
+            
+            # 2. Renderizamos el dial y obtenemos la frecuencia física actual
+            f_actual = render_radio(theta) 
+            
+            lista_volumenes = []
+
+            # 3. BUCLE DE AUDIO: Sintonía de las 7 canciones
+            # Este bucle recorre cada estación y ajusta su volumen según la distancia
+            for i in range(7):
+                try:
+                    # Obtenemos la frecuencia de la estación 'i'
+                    angulo_estacion = angulos_est[i]
+                    _, f_est = calcular_fisica(angulo_estacion)
+                    
+                    # Referencia al elemento <audio id="trackX">
+                    audio_id = f"track{i+1}"
+                    audio_elem = document.getElementById(audio_id)
+                    
+                    if audio_elem:
+                        # Cálculo matemático de la sintonía (Campana de Gauss)
+                        distancia = abs(f_actual - f_est)
+                        # El número 25 define qué tan "ancha" es la sintonía
+                        vol = np.exp(-(distancia**2) / (2 * 25**2))
+                        
+                        # Aplicamos el volumen al reproductor del navegador
+                        nuevo_vol = float(np.clip(vol, 0, 1))
+                        audio_elem.volume = nuevo_vol
+                        lista_volumenes.append(nuevo_vol)
+                except Exception as e:
+                    print(f"Error procesando {audio_id}: {e}")
+
+            # 4. CONTROL DE ESTÁTICA
+            # Si no hay ninguna canción sonando fuerte, subimos el ruido blanco
+            try:
+                estatica = document.getElementById("estatica")
+                if estatica and len(lista_volumenes) > 0:
+                    max_vol = max(lista_volumenes)
+                    # El ruido suena cuando el volumen de las canciones es bajo
+                    estatica.volume = float(np.clip(0.2 * (1 - max_vol), 0, 0.2))
+            except:
+                pass
+
+        slider_proxy = create_proxy(actualizar_radio)
+        document.getElementById("slider-theta").addEventListener("input", slider_proxy)
+        render_radio(0)
+    </script>
+</div>
+
+<script>
+    function iniciarRadio() {
+        // Desbloquea todos los audios por interacción del usuario
+        const tracks = ["track1", "track2", "track3", "track4", "track5", "track6", "track7", "estatica"];
+        tracks.forEach(id => {
+            let a = document.getElementById(id);
+            a.play();
+            a.volume = 0;
+        });
+        document.getElementById("btn-encender").style.display = "none";
+    }
+</script>
+
+<h1 id="conclusiones">6. Conclusiones</h1>
+
+<p>A la hora de modificar la frecuencia en un radio antiguo, se
+
+aprovechó la particularidad de como disminuía la capacitancia de un
+
+capacitor de placas paralelas, para modificar la frecuencia
+
+recibida.</p>
+
+<p>Es posible ver como un pequeño cambio en el ángulo no hace mucho,
+
+pero a medida que la apertura es más prominente, la manera en que cambia
+
+la capacitancia y frecuencia crece de forma exponencial.</p>
+
+<div class="thebibliography">
+
+<p><span>00</span></p>
+
+<p>R. A. Serway y J. W. Jewett, Física para ciencias e ingeniería, vol.
+
+2, 7.ª ed. Ciudad de México, México: Cengage Learning, 2009.</p>
+
+<p>R. P. Deshpande, "How do tuning capacitors work?," Capacitor Connect,
+
+2024. [En línea]. Disponible en:
+
+https://www.capacitorconnect.com/how-do-tuning-capacitors-work/.
+
+[Accedido: 20, abr., 2026].</p>
+
+<p>"The path of high-quality development for automotive chips:
+
+Innovation, safety, and supply chain synergy," EEWorld, 18 de diciembre
+
+de 2024. [En línea]. Disponible en:
+
+https://en.eeworld.com.cn/news/qrs/eic695188.html. [Accedido: 20, abr.,
+
+2026].</p>
+
+<p>Google Gemini, "Depuración y optimización de algoritmo en [Python],"
+
+v. 1.5 Flash, 20 de abril de 2026. [Software de IA generativa].
+
+Disponible en: https://gemini.google.com/</p>
+
+</div>
+
+<script>
+        function iniciarRadio() {
+            console.log("Iniciando motores de audio...");
+            
+            // Lista de todos los IDs de audio que definimos en el HTML
+            const audios = ["track1", "track2", "track3", "track4", "track5", "track6", "track7", "estatica"];
+            
+            audios.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    // El navegador permite el play() porque este código 
+                    // se ejecuta DENTRO del clic del botón.
+                    el.play().then(() => {
+                        el.volume = 0; // Empiezan mudos
+                        console.log("Reproductor listo: " + id);
+                    }).catch(e => {
+                        console.error("Error al cargar el archivo " + id + ": ", e);
+                    });
+                } else {
+                    console.warn("No se encontró el elemento: " + id);
+                }
+            });
+            
+            // Ocultamos el botón para que la interfaz se vea limpia
+            document.getElementById("btn-encender").style.display = "none";
+        }
+    </script>
+</body>
+</html>
